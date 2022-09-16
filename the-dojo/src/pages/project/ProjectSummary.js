@@ -1,8 +1,16 @@
 import React from 'react'
 import Avatar from '../../components/Avatar'
+import { useFirestore } from '../../hooks/useFirestore'
+import { useAuthContext } from '../../hooks/useAuthContext'
 
 export default function ProjectSummary({project}) {
-  return (
+    
+    const {user} = useAuthContext()
+    const {deleteDocument} = useFirestore('projects')
+    const handleClick = () =>{
+        deleteDocument(project.id)
+    }
+    return (
     <div>
         <div className='project-summary'>
             <h2 className='page-title'>{project.name}</h2>
@@ -12,14 +20,18 @@ export default function ProjectSummary({project}) {
             <p className='details'>
                 {project.details}
             </p>
-            <h4>Projecct is assigned to: </h4>
+            <h4>Project is assigned to: </h4>
+            <div className='assigned-users'>
             {project.assignedUsersList.map(user =>(
                 <div key={user.id}>
                     <Avatar  src = {user.photoURL} />
                 </div>
             ))}
-
-        </div>
+            </div>
+            {user.uid === project.createdBy.id && (
+            <button className='btn' onClick={handleClick}>Delete</button>
+            )}
+            </div>
     </div>
   )
 }
